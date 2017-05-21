@@ -26,9 +26,14 @@ class Vector(object):
     def __str__(self):
         return 'Vector: {}'.format(self.coordinates)
 
-
     def __eq__(self, v):
         return self.coordinates == v.coordinates
+
+    def __iter__(self):
+        return iter(self.coordinates)
+
+    def __getitem__(self,index):
+        return self.coordinates[index]
 
     def plus(self, v):
         if (self.dimension != v.dimension):
