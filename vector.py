@@ -7,7 +7,7 @@ class Vector(object):
 
     MSG_NORM_ZERO_VECTOR = 'Cannot normalize the zero vector'
     MSG_ANGL_ZERO_VECTOR = 'Cannot compute angle with the zero vector'
-    MSG_DOT_DIF_DIM = 'Cannot perform dot products on vector with different dimensions'
+    MSG_DIF_DIM = 'Operands need to have the same dimensions'
 
     def __init__(self, coordinates):
         try:
@@ -31,22 +31,28 @@ class Vector(object):
         return self.coordinates == v.coordinates
 
     def plus(self, v):
-        nc = [x+y for x,y in zip(self.coordinates, v.coordinates)]
+        if (self.dimension != v.dimension):
+            raise Exception(MSG_DIF_DIM)
+
+        nc = [Decimal(x+y) for x,y in zip(self.coordinates, v.coordinates)]
         return Vector(nc)
 
     def minus(self, v):
-        nc = [x-y for x,y in zip(self.coordinates, v.coordinates)]
+        if (self.dimension != v.dimension):
+            raise Exception(MSG_DIF_DIM)
+
+        nc = [Decimal(x-y) for x,y in zip(self.coordinates, v.coordinates)]
         return Vector(nc)
 
     def times_scalar(self, c):
-        nc = [c*x for x in self.coordinates]
+        nc = [Decimal(c*x) for x in self.coordinates]
         return Vector(nc)
 
     def magnitude(self):
-        sq = [x*x for x in self.coordinates]
+        sq = [Decimal(x*x) for x in self.coordinates]
         return Decimal(math.sqrt(sum(sq)))
 
-    def normalization(self):
+    def normalized(self):
         try:
             mag = self.magnitude()
             return self.times_scalar(Decimal(1)/mag)
@@ -55,22 +61,23 @@ class Vector(object):
 
     def dot(self, v):
         if (self.dimension != v.dimension):
-            raise Exception(MSG_DOT_DIF_DIM)
+            raise Exception(MSG_DIF_DIM)
 
-        dot = Decimal(sum([x*y for x,y in zip(self.coordinates, v.coordinates)]))
-
-        # NOT a nice workaround!!!!!
-        if dot > 1:
-            return Decimal(1)
-        elif dot < -1:
-            return Decimal(-1)
-        else:
-            return dot
+        return Decimal(sum([x*y for x,y in zip(self.coordinates, v.coordinates)]))
 
     def angle_with(self, v, in_degrees=False):
-        
+        if (self.dimension != v.dimension):
+            raise Exception(MSG_DIF_DIM)
+
         try:
-            rad = math.acos(self.normalization().dot(v.normalization()))
+            cosang = self.normalized().dot(v.normalized())
+            # precision workaround
+            if cosang > 1:
+                cosang = 1
+            elif cosang < 0:
+                cosang = 0
+
+            rad = math.acos(cosang)
         except Exception as e:
             if str(e) == self.MSG_NORM_ZERO_VECTOR:
                 raise Exception(self.MSG_ANGL_ZERO_VECTOR)
@@ -98,24 +105,24 @@ class Vector(object):
     def is_zero(self, epsilon=1e-10):
         return (abs(self.magnitude()) < epsilon)
 
+    def component_parallel_to(self, b):
+        ub = b.normalized()
+        return ub.times_scalar(self.dot(ub))
 
-v = Vector([-7.579, -7.88])
-w = Vector([22.737, 23.64])
-print v.is_parallel_to(w)
-print v.is_orthogonal_to(w)
+    def component_orthogonal_to(self, b):
+        return self.minus(self.component_parallel_to(b))
 
-v = Vector([-2.029, 9.97, 4.172])
-w = Vector([-9.231, -6.639, -7.245])
-print v.is_parallel_to(w)
-print v.is_orthogonal_to(w)
 
-v = Vector([-2.328, -7.284, -1.214])
-w = Vector([-1.821, 1.072, -2.94])
-print v.is_parallel_to(w)
-print v.is_orthogonal_to(w)
 
-v = Vector([2.118, 4.827])
-w = Vector([0, 0])
-print v.is_parallel_to(w)
-print v.is_orthogonal_to(w)
+v = Vector([3.039, 1.879])
+b = Vector([0.825, 2.036])
+print v.component_parallel_to(b)
 
+v = Vector([-9.88, -3.264, -8.159])
+b = Vector([-2.155, -9.353, -9.473])
+print v.component_orthogonal_to(b)
+
+v = Vector([3.009, -6.172, 3.692, -2.51])
+b = Vector([6.404, -9.144, 2.759, 8.718])
+print v.component_parallel_to(b)
+print v.component_orthogonal_to(b)
