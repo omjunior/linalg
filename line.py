@@ -99,7 +99,16 @@ class Line(object):
     def is_parallel_to(self, l):
         return self.normal_vector.is_parallel_to(l.normal_vector);
 
-    def is_equal_to(self, l):
+    def __eq__(self, l):
+        # cases when normal vector is zero
+        if self.normal_vector.is_zero():
+            if not l.normal_vector.is_zero():
+                return False
+            else:
+                return MyDecimal(self.constant_term - l.constant_term).is_near_zero()
+        elif l.normal_vector.is_zero():
+            return False
+        # other cases
         if not self.is_parallel_to(l):
             return False
         if self.basepoint == l.basepoint:
@@ -108,12 +117,12 @@ class Line(object):
 
     def intersection_with(self, l):
         if self.is_parallel_to(l):
-            if self.is_equal_to(l):
-                # if same line return Inf for each coordinate
-                return Vector([Decimal('Inf')] * self.dimension)
+            if self == l:
+                # if same line
+                return self
             else:
-                # if parallel return NaN for each coordinate
-                return Vector([Decimal('NaN')] * self.dimension)
+                # if parallel
+                return None
 
         A, B = self.normal_vector
         C, D = l.normal_vector
