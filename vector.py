@@ -122,18 +122,3 @@ class Vector(object):
 
     def triangle_area(self, v):
         return self.parallelogram_area(v) / 2
-
-
-
-
-v = Vector([8.462, 7.893, -8.187])
-b = Vector([6.984, -5.975, 4.778])
-print v.cross_product(b)
-
-v = Vector([-8.987, -9.838, 5.031])
-b = Vector([-4.268, -1.861, -8.866])
-print v.parallelogram_area(b)
-
-v = Vector([1.5, 9.547, 3.691])
-b = Vector([-6.007, 0.124, 5.772])
-print v.triangle_area(b)
