@@ -74,8 +74,8 @@ class Vector(object):
             # precision workaround
             if cosang > 1:
                 cosang = 1
-            elif cosang < 0:
-                cosang = 0
+            elif cosang < -1:
+                cosang = -1
 
             rad = math.acos(cosang)
         except Exception as e:
