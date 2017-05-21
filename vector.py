@@ -112,17 +112,28 @@ class Vector(object):
     def component_orthogonal_to(self, b):
         return self.minus(self.component_parallel_to(b))
 
+    def cross_product(self, v):
+        return Vector([(self.coordinates[1] * v.coordinates[2] - v.coordinates[1] * self.coordinates[2]),
+            -(self.coordinates[0] * v.coordinates[2] - v.coordinates[0] * self.coordinates[2]),
+            (self.coordinates[0] * v.coordinates[1] - v.coordinates[0] * self.coordinates[1])])
+
+    def parallelogram_area(self, v):
+        return self.cross_product(v).magnitude();
+
+    def triangle_area(self, v):
+        return self.parallelogram_area(v) / 2
 
 
-v = Vector([3.039, 1.879])
-b = Vector([0.825, 2.036])
-print v.component_parallel_to(b)
 
-v = Vector([-9.88, -3.264, -8.159])
-b = Vector([-2.155, -9.353, -9.473])
-print v.component_orthogonal_to(b)
 
-v = Vector([3.009, -6.172, 3.692, -2.51])
-b = Vector([6.404, -9.144, 2.759, 8.718])
-print v.component_parallel_to(b)
-print v.component_orthogonal_to(b)
+v = Vector([8.462, 7.893, -8.187])
+b = Vector([6.984, -5.975, 4.778])
+print v.cross_product(b)
+
+v = Vector([-8.987, -9.838, 5.031])
+b = Vector([-4.268, -1.861, -8.866])
+print v.parallelogram_area(b)
+
+v = Vector([1.5, 9.547, 3.691])
+b = Vector([-6.007, 0.124, 5.772])
+print v.triangle_area(b)
