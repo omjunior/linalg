@@ -96,6 +96,31 @@ class Line(object):
                 return k
         raise Exception(Line.NO_NONZERO_ELTS_FOUND_MSG)
 
+    def is_parallel_to(self, l):
+        return self.normal_vector.is_parallel_to(l.normal_vector);
+
+    def is_equal_to(self, l):
+        if not self.is_parallel_to(l):
+            return False
+        if self.basepoint == l.basepoint:
+            return True
+        return (self.basepoint.minus(l.basepoint)).is_orthogonal_to(self.normal_vector)
+
+    def intersection_with(self, l):
+        if self.is_parallel_to(l):
+            if self.is_equal_to(l):
+                # if same line return Inf for each coordinate
+                return Vector([Decimal('Inf')] * self.dimension)
+            else:
+                # if parallel return NaN for each coordinate
+                return Vector([Decimal('NaN')] * self.dimension)
+
+        A, B = self.normal_vector
+        C, D = l.normal_vector
+        k1 = self.constant_term
+        k2 = l.constant_term
+
+        return Vector([((D*k1 - B*k2)/(A*D-B*C)), ((-C*k1+A*k2)/(A*D-B*C))])
 
 class MyDecimal(Decimal):
     def is_near_zero(self, eps=1e-10):
